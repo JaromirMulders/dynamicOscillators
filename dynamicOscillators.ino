@@ -1,12 +1,13 @@
 //Example for dynamicly creating oscillators and dynamicly routing them within the teensy audio library. 
-//Written for teensy3.2 with aa udio adapter board
+//In this example up to 16 oscillators can be created
+//Written for teensy 3.2 with audio adapter board
 
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
 
-#define cVoiceAmount   16
+#define cVoiceAmount   16 
 #define cMixerChannels 4
 #define cMainVolume    0.5
 
@@ -21,9 +22,10 @@ AudioConnection outL(synthOut,0, dac, 0);
 AudioConnection outR(synthOut,0, dac, 1);
 
 //calculate how many mixers there need to be
-const byte cNumMixers = cVoiceAmount / cMixerChannels;
+byte cNumMixers = cVoiceAmount / cMixerChannels;
 
 void setup() {
+  cNumMixers = constrain(cNumMixers,1,4);
 
   //initialize audio 
   AudioMemory(24);
@@ -38,9 +40,9 @@ void setup() {
   for(int i = 0; i < cVoiceAmount; i++){
     //initialize oscillators
     float fVoiceAmount = (float)cVoiceAmount;
-    float oscillatorVolume = (1. - (float)i/fVoiceAmount) / fVoiceAmount + 1./fVoiceAmount;
+    float oscillatorVolume = ((1. - (float)i/fVoiceAmount) / fVoiceAmount + 1./fVoiceAmount) * 0.5;
     oscillators[i].begin(oscillatorVolume,i*100+100,WAVEFORM_SINE); 
-    delay(250);
+    delay(500);
         
     byte mixerCount = i/cMixerChannels;
     //make connections
